@@ -1,0 +1,7 @@
+Value NAME (.+[^"])
+Value List MEMBERS (.+[^"])
+
+Start
+  ^address-group\s+ipv4\s+(\"|)${NAME}(\"|)
+  ^\s+(address-object|address-group)\s+ipv4\s+(\"|)${MEMBERS}(\"|)
+  ^\s+exit -> Record

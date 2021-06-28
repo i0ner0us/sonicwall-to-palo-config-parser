@@ -1,0 +1,7 @@
+Value NAME ("(.+?)"|\S+)
+Value List MEMBERS ("(.+?)"|\S+)
+
+Start
+  ^service-group\s${NAME}
+  ^\s+(service-object|service-group)\s${MEMBERS}
+  ^\s+exit -> Record

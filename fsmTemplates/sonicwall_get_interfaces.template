@@ -1,0 +1,19 @@
+Value INTERFACE_NAME (\w+)
+Value ZONE (\w+)
+Value IP_ADDRESS ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)
+Value NETMASK ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)
+Value GATEWAY ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)
+Value DESCRIPTION (.*)
+
+Start
+  ^interface\s+${INTERFACE_NAME} -> GetIPV4Address
+
+GetIPV4Address
+  ^interface\s+ipv6. -> End
+  ^interface\s+${INTERFACE_NAME}
+  ^\s+ip-assignment\s+${ZONE}.*
+  ^\s+ip\s+${IP_ADDRESS}\s+netmask\s+${NETMASK}
+  ^.*gateway(\s${GATEWAY}|)
+  ^\s+exit
+  ^\s+comment(\s${DESCRIPTION}|) -> Record
+  ^\s+exit -> Start

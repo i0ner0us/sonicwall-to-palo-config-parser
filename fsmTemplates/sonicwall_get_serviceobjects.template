@@ -1,0 +1,10 @@
+Value NAME ("(.*?)"|\S+)
+Value PROTOCOL (\w+)
+Value DESTINATION_PORT (("(.*?)"|\S+))
+Value START_PROTO (\d+)
+Value END_PROTO (\d+)
+
+Start
+  ^service-object\s+${NAME}\s${PROTOCOL}\s${START_PROTO}\s${END_PROTO} -> Record
+  ^service-object\s+${NAME}\s${PROTOCOL}\s${DESTINATION_PORT} -> Record
+  ^service-object\s+${NAME}\s${PROTOCOL} -> Record

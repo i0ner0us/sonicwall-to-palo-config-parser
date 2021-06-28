@@ -1,0 +1,36 @@
+Value ID ("(.+?)"|\S+)
+Value FROM (\S+)
+Value TO (\S+)
+Value SRC ("(.+?)"|\S+)
+Value DST ("(.+?)"|\S+)
+Value SERVICE ("(.+?)"|\S+)
+Value TP_SOURCE ("(.+?)"|\S+)
+Value TP_DESTINATION ("(.+?)"|\S+)
+Value TP_SERVICE ("(.+?)"|\S+)
+Value STATE (enable|no enable)
+Value DESCRIPTION ("(.+?)"|\S+)
+
+
+Start
+  ^nat-policy.* -> GetNatRule
+
+GetNatRule
+  ^ip-helper.* -> End
+  ^\s+id\s${ID}
+  ^\s+inbound\s${FROM}
+  ^\s+outbound\s${TO}
+  ^\s+source\s(name|group)\s${SRC}
+  ^\s+source\s${SRC}
+  ^\s+translated-source\s(name|group)\s${TP_SOURCE}
+  ^\s+translated-source\s${TP_SOURCE}
+  ^\s+destination\s(name|group)\s${DST}
+  ^\s+destination\s${DST}
+  ^\s+translated-destination\s(name|group)\s${TP_DESTINATION}
+  ^\s+translated-destination\s${TP_DESTINATION}
+  ^\s+service\s(name|group)\s${SERVICE}
+  ^\s+service\s${SERVICE}
+  ^\s+translated-service\s(name|group)\s${TP_SERVICE}
+  ^\s+translated-service\s${TP_SERVICE}
+  ^\s+${STATE}
+  ^\s+comment\s${DESCRIPTION}
+  ^\s+exit -> Record

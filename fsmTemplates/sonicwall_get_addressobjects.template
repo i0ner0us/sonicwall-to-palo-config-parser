@@ -1,0 +1,12 @@
+Value NAME ("(.*?)"|\S+)
+Value ZONE (\w+)
+Value TYPE (\w+)
+Value NETWORK ([0-9]+.[0-9]+.[0-9]+.[0-9]+)
+Value NETMASK ([0-9]+.[0-9]+.[0-9]+.[0-9]+)
+Value START_IP (\S+)
+Value END_IP (\S+)
+
+Start
+  ^address-object\s+ipv4\s+${NAME}\s+${TYPE}\s+${NETWORK}\szone\s${ZONE} -> Record
+  ^address-object\s+ipv4\s+${NAME}\s${TYPE}\s${NETWORK}\s${NETMASK}\szone\s${ZONE} -> Record
+  ^address-object\s+ipv4\s+${NAME}\s+${TYPE}\s+${NETWORK} -> Record

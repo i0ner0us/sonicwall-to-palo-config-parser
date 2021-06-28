@@ -1,0 +1,30 @@
+Value ID ("(.+?)"|\S+)
+Value STATUS (enable|no enable)
+Value FROM (\S+)
+Value TO (\S+)
+Value ACTION (\S+)
+Value SRC ("(.+?)"|\S+)
+Value SRC_PORT (\S+)
+Value SERVICE ("(.+?)"|\S+)
+Value DST ("(.+?)"|\S+)
+Value DESCRIPTION ("(.+?)"|\S+)
+
+Start
+  ^access-rule\sfrom -> GetContent
+
+GetContent
+  ^nat-policy.* -> End
+  ^\s+id\s${ID}
+  ^\s+${STATUS}
+  ^\s+from\s${FROM}
+  ^\s+to\s${TO}
+  ^\s+action\s${ACTION}
+  ^\s+source\saddress\s(name|group)\s${SRC}
+  ^\s+source\saddress\s${SRC}
+  ^\s+source\sport\s${SRC_PORT}
+  ^\s+service\s(name|group)\s${SERVICE}
+  ^\s+service\s${SERVICE}
+  ^\s+destination\saddress\s(name|group)\s${DST}
+  ^\s+destination\saddress\s${DST}
+  ^\s+comment\s${DESCRIPTION}
+  ^\s+exit -> Record
