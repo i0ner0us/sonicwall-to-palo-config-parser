@@ -1,9 +1,58 @@
 import textfsm, sys, argparse
 
-inFileName = 'config.conf'
-inFile=open(inFileName, 'r')
-confFile=inFile.read()
-inFile.close()
+######################################################################################
+#################################### Instructions ####################################
+######################################################################################
+
+'''
+    To execute the script the following dir structure needs to be in palce
+
+    Mode                LastWriteTime
+    ----                -------------
+    Directory           ConvertedFiles
+    Directory           fsmTemplates
+    --file              --fsmTemplates\sonicwall_get_access_rules.template
+    --file              --fsmTemplates\sonicwall_get_addressgroups.template
+    --file              --fsmTemplates\sonicwall_get_addressobjects.template
+    --file              --fsmTemplates\sonicwall_get_interfaces.template
+    --file              --fsmTemplates\sonicwall_get_nat_policies.template
+    --file              --fsmTemplates\sonicwall_get_servicegroups.template
+    --file              --fsmTemplates\sonicwall_get_serviceobjects.template
+    --file              --fsmTemplates\sonicwall_get_zones.template
+    -File              config.conf
+    -File              main.py
+
+    run the script from powershell by using the following structure:
+        python.exe .\main.py --conf_file "c:\path\to\conf\file\config.conf"
+
+    if you do not supply the --conf_file parameter it will default to use a file in the same folder as main.py
+    with a name of "config.conf". When the program is ran it will output the following files into the ConvertedFiles folder:
+
+        ConvertedFiles\access-rules.csv
+        ConvertedFiles\address-groups.csv
+        ConvertedFiles\address-objects.csv
+        ConvertedFiles\interfaces.csv
+        ConvertedFiles\nat-policies.csv
+        ConvertedFiles\service-groups.csv
+        ConvertedFiles\service-objects.csv
+        ConvertedFiles\zones.csv
+
+    These files can be used to import the config into Palo Alto expedition using the csv function.
+'''
+
+######################################################################################
+#################################### Requirements ####################################
+######################################################################################
+
+'''
+    This program requires the following modules to be installed
+
+    textfsm==1.1.0
+    argparse==1.4.0
+
+    to install these using pip you can use the requirements.txt file in this repo and use the following cli command:
+        python.exe -m pip install -r requirements.txt
+'''
 
 def writeToCSV(fileName,fsm_results,re_table):
     # the results are written to a CSV file
@@ -54,7 +103,7 @@ def getAddressGroups(confFile):
 
     # ...now all row's which were parsed by TextFSM
     # this output takes all the members of the address grouo and
-    # ouputs them eith a comma inbetween. when it gets to the last object
+    # ouputs them with a comma inbetween. when it gets to the last object
     # it writes the object without a comma.
     counter = 0
     for row in fsm_results:
@@ -132,6 +181,7 @@ def getInterfaces(confFile):
 
     # Display result as CSV and write it to the output file
     # First the column headers...
+    # we create a custom header here to add in the media type which is required for PA to import to Panorama
     header = ['INTERFACE_NAME', 'ZONE', 'IP_ADDRESS', 'NETMASK', 'GATEWAY', 'DESCRIPTION','MEDIA']
     print(header)
     for s in header:
@@ -166,6 +216,7 @@ def getZones(confFile):
 
     # Display result as CSV and write it to the output file
     # First the column headers...
+    # we create a custom header here to add the type column which is reuquired to import into a panorama
     header = ['ZONE','TYPE']
     print(header)
     for s in header:
@@ -186,7 +237,7 @@ def getZones(confFile):
 def getAccessRules(confFile):
     # open up the raw data from the config file and search through it using a textfsm template
     # this will then put the data in the below format using an array
-    # zone
+    # ID,STATUS,FROM,TO,ACTION,SRC,SRC_PORT,SERVICE,DST,DESCRIPTION
     template = open("fsmTemplates\sonicwall_get_access_rules.template")
     re_table = textfsm.TextFSM(template)
     fsm_results = re_table.ParseText(confFile)
@@ -196,7 +247,7 @@ def getAccessRules(confFile):
 def getNatPolicies(confFile):
     # open up the raw data from the config file and search through it using a textfsm template
     # this will then put the data in the below format using an array
-    #
+    # ID,FROM,TO,SRC,DST,SERVICE,TP_SOURCE,TP_DESTINATION,TP_SERVICE,STATE,DESCRIPTION
     template = open("fsmTemplates\sonicwall_get_nat_policies.template")
     re_table = textfsm.TextFSM(template)
     fsm_results = re_table.ParseText(confFile)
@@ -311,6 +362,27 @@ def getServiceObjects(confFile):
 
 
 def main():
+
+    # Get parameters from cli
+    # initiate the parser
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-c", "--conf_file", default='', help="full path to config file to be parsed")
+
+    # read arguments from the command line
+    args = parser.parse_args()
+
+    # check to see if config file param was provided via cli
+    if args.conf_file:
+        inFileName = args.conf_file
+        inFile=open(inFileName, 'r')
+        confFile=inFile.read()
+        inFile.close()
+    else:
+        inFileName = 'config.conf'
+        inFile=open(inFileName, 'r')
+        confFile=inFile.read()
+        inFile.close()
+
     # run the address groups function to grab the address groups and members from the configurations
     # and export to csv
     getAddressGroups(confFile)

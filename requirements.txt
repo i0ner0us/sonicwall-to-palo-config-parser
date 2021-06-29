@@ -1,4 +1,2 @@
-json
-textfsm
-sys
-argparse
+textfsm==1.1.0
+argparse==1.4.0
